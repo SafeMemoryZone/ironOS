@@ -3,64 +3,59 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    # Add flake-utils to handle multiple systems
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs }:
-    # TODO: support more platforms
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        crossPkgs = pkgs.pkgsCross.x86_64-embedded;
 
-    let
-      system = "aarch64-darwin";
+        # To ensure compatibility on all platforms, we fetch the Limine binaries 
+        # that also include the source code and compile them locally.
+        limineVersion = "10.6.6";
 
-      pkgs = import nixpkgs { inherit system; };
-      crossPkgs = pkgs.pkgsCross.x86_64-embedded;
+        limine-src = pkgs.fetchFromGitHub {
+          owner = "limine-bootloader";
+          repo = "limine";
+          rev = "v${limineVersion}-binary";
+          sha256 = "sha256-ulDELUBmJ2qgjsPE1KUfucmf99DxMLT0ceAEAvdKzFY=";
+        };
 
-      # NOTE: The nixpkgs limine package excludes x86 binaries when installed on aarch64-darwin
-      # We fetch the full binary release from GitHub to get the BIOS files needed for the ISO
-
-      # Build limine
-
-      limineVersion = "10.6.6";
-
-      limine-src = pkgs.fetchFromGitHub {
-        owner = "limine-bootloader";
-        repo = "limine";
-        rev = "v${limineVersion}-binary";
-        sha256 = "sha256-ulDELUBmJ2qgjsPE1KUfucmf99DxMLT0ceAEAvdKzFY=";
-      };
-
-      # Build the CLI tool from the same source as the bootloader binaries
-      limine-cli = pkgs.stdenv.mkDerivation {
-        pname = "limine-cli";
-        version = limineVersion;
-        src = limine-src;
-
-        installPhase = ''
-          mkdir -p $out/bin
-          cp limine $out/bin/
-        '';
-      };
-    in
-    {
-      devShells.${system}.default = pkgs.mkShell {
-        nativeBuildInputs = [
-            # C cross-compiler
+        limine-cli = pkgs.stdenv.mkDerivation {
+          pname = "limine-cli";
+          version = limineVersion;
+          src = limine-src;
+          installPhase = ''
+            mkdir -p $out/bin
+            cp limine $out/bin/
+          '';
+        };
+      in
+      {
+        devShells.default = pkgs.mkShell {
+          nativeBuildInputs = [
+            # GCC cross-compiler (includes the linker)
             crossPkgs.buildPackages.gcc
-
-            # Bootloader CLI tool
+            
+            # Limine bootloader
             limine-cli
 
-            # Used to package the OS into an ISO file
+            # Utility used to create ISO files
             pkgs.xorriso
-
+            
             # Emulator used to test ironOS
             pkgs.qemu
-        ];
+          ];
 
-        shellHook = ''
-          export TOOLCHAIN_PREFIX="x86_64-elf-"
-          export LIMINE="limine"
-          export LIMINE_DATADIR="${limine-src}"
-        '';
-      };
-    };
+          shellHook = ''
+            export TOOLCHAIN_PREFIX="x86_64-elf-"
+            export LIMINE="limine"
+            export LIMINE_DATADIR="${limine-src}"
+          '';
+        };
+      }
+    );
 }
