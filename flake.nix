@@ -39,6 +39,9 @@
           nativeBuildInputs = [
             # GCC cross-compiler (includes the linker)
             crossPkgs.buildPackages.gcc
+
+            # Generating compile commands for LSPs
+            pkgs.compiledb
             
             # Limine bootloader
             limine-cli
