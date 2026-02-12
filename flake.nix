@@ -35,6 +35,7 @@
         };
       in
       {
+        # nix develop
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = [
             # GCC cross-compiler (includes the linker)
@@ -58,6 +59,44 @@
             export LIMINE="limine"
             export LIMINE_DATADIR="${limine-src}"
           '';
+        };
+
+        # nix build
+        packages.default = pkgs.stdenv.mkDerivation {
+            pname = "ironOS";
+            version = "0.0.0";
+            src = ./.;
+
+            nativeBuildInputs = [
+              crossPkgs.buildPackages.gcc
+              limine-cli
+              pkgs.xorriso
+            ];
+
+            # Replicate the shell variables
+            TOOLCHAIN_PREFIX = "x86_64-elf-";
+            LIMINE = "limine";
+            LIMINE_DATADIR = "${limine-src}";
+
+            # Environment vars needed by Makefile
+            BUILD_DIR = "build";
+            OUT = "ironOS";
+
+            # Default buildPhase is make
+            
+            # We need to tell Nix where to put the output ISO
+            installPhase = ''
+              mkdir -p $out
+              cp build/ironOS.iso $out/
+            '';
+        };
+
+        # nix run
+        apps.default = {
+          type = "app";
+          program = "${pkgs.writeShellScript "run-ironOS" ''
+            ${pkgs.qemu}/bin/qemu-system-x86_64 -cdrom ${self.packages.${system}.default}/ironOS.iso
+          ''}";
         };
       }
     );

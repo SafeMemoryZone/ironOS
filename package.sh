@@ -20,12 +20,6 @@ if [ ! -f "$KERNEL_BIN" ]; then
     exit 1
 fi
 
-# Check if external tools are available
-if ! command -v xorriso >/dev/null 2>&1; then
-    echo "Error: 'xorriso' is not installed or not in PATH."
-    exit 1
-fi
-
 # Define paths based on environment variables
 ISO_NAME="${ISO_NAME:-ironOS.iso}"
 ISO_ROOT="${BUILD_DIR}/iso-root"

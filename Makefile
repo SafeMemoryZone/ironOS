@@ -1,8 +1,9 @@
 # Directories and files
-OUT := ironOS
+OUT ?= ironOS
+BUILD_DIR ?= build
+
 SRC_DIR := src
 INC_DIR := include
-BUILD_DIR := build
 LINKER_SCRIPTS_DIR := linker-scripts
 
 # Export environment variables needed for package.sh
