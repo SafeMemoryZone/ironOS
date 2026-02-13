@@ -51,7 +51,7 @@ LDFLAGS += \
     -T $(LINKER_SCRIPTS_DIR)/linker.ld
 
 # Source files
-SRCS := $(shell find $(SRC_DIR) -type f \( -name '*.c' -o -name '*.S' -o -name '*.asm' \))
+SRCS := $(shell find $(SRC_DIR) -type f \( -name '*.c' -o -name '*.S' \))
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 -include $(DEPS)
