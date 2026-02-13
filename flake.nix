@@ -95,7 +95,7 @@
         apps.default = {
           type = "app";
           program = "${pkgs.writeShellScript "run-ironOS" ''
-            ${pkgs.qemu}/bin/qemu-system-x86_64 -cdrom ${self.packages.${system}.default}/ironOS.iso
+            ${pkgs.qemu}/bin/qemu-system-x86_64 -cdrom ${self.packages.${system}.default}/ironOS.iso -serial file:kernel.log
           ''}";
         };
       }
