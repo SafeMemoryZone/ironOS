@@ -2,18 +2,18 @@
 
 // Halt and catch fire function.
 static void hcf(void) {
-    for (;;) {
-        asm ("hlt");
-    }
+	for (;;) {
+		asm("hlt");
+	}
 }
 
 // Kernel entry point
 void kmain(void) {
-    // Initilize logger before anything else
-    init_logger();
+	// Initilize logger before anything else
+	init_logger();
 
-    log(LL_INFO, "Kernel gained control");
+	log(LL_INFO, "Kernel gained control");
 
-    // Halt
-    hcf();
+	// Halt
+	hcf();
 }
