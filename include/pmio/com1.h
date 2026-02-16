@@ -7,4 +7,4 @@ int init_com1();
 // Writes a single character
 void write_com1(char a);
 
-#endif // COM1_H
+#endif  // COM1_H

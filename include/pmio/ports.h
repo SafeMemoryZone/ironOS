@@ -18,4 +18,4 @@ void port_word_out(uint16_t port, uint16_t data);
 // Small delay to prevent race conditions on old hardware
 void io_wait(void);
 
-#endif
+#endif // PORTS_H
