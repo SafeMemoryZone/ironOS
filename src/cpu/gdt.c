@@ -1,5 +1,4 @@
 #include <cpu/gdt.h>
-#include <debug/logging.h>
 #include <stdint.h>
 
 /*
@@ -59,6 +58,11 @@ struct gdt_system_descriptor_high {
 	uint32_t reserved : 32;
 } __attribute__((packed));
 
+struct gdt_ptr {
+	uint16_t size : 16;
+	uint64_t addr : 64;
+} __attribute__((packed));
+
 // We must define a type that's compatible with gdt_segment_descriptor and
 // gdt_system_descriptor_high
 typedef uint64_t gdt_entry_t;
@@ -69,15 +73,22 @@ typedef uint64_t gdt_entry_t;
 // Limine will initilize the .bss section for us
 static gdt_entry_t GDT[GDT_ENTRY_COUNT];
 
+// Defined in gdt.S
+extern void load_and_flush_gdt(struct gdt_ptr*);
+
 static inline void install_segment_descriptor(int off, const void* desc) {
 	GDT[off] = *(gdt_entry_t*)desc;
+}
+
+static inline struct gdt_ptr make_gdtr() {
+	return (struct gdt_ptr){.size = sizeof(GDT) - 1, .addr = (uint64_t)&GDT};
 }
 
 void init_gdt() {
 	struct gdt_segment_descriptor null = {0}, kernel_code = {0}, kernel_data = {0}, user_code = {0},
 	                              user_data = {0};
 
-	// TODO: TSS is not implemented yet
+	// TODO: Implement TSS
 
 	// Kernel code
 	kernel_code.access_byte =
@@ -132,15 +143,16 @@ void init_gdt() {
 	                      // are ignored in long mode
 
 	// WARN: Each GDT segment descriptor MUST be installed into specific offsets. This is due to the
-	// SYSCALL and SYSRET instructions, that assume a specific structure.
+	// SYSCALL and SYSRET instructions, that assume a specific structure. load_and_flush_gdt also
+	// relies on specific offsets.
 	install_segment_descriptor(0, &null);
 	install_segment_descriptor(1, &kernel_code);
 	install_segment_descriptor(2, &kernel_data);
-	install_segment_descriptor(3, &null);  // 32-bit user code. Left NULL for now
+	install_segment_descriptor(3, &null);  // 32-bit user code. Left on null for now
 	install_segment_descriptor(4, &user_data);
 	install_segment_descriptor(5, &user_code);
 
-	// TODO: load GDT
-
-	log(LL_INFO, "Initilized GDT");
+	// Load the GDT
+	struct gdt_ptr gdtr = make_gdtr();
+	load_and_flush_gdt(&gdtr);
 }
