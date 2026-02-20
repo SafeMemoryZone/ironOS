@@ -80,6 +80,7 @@ static inline void install_segment_descriptor(int off, const void* desc) {
 	GDT[off] = *(gdt_entry_t*)desc;
 }
 
+// Loading the GDT (using the 'lgdt' instruction) requires a special gdt pointer structure
 static inline struct gdt_ptr make_gdtr() {
 	return (struct gdt_ptr){.size = sizeof(GDT) - 1, .addr = (uint64_t)&GDT};
 }

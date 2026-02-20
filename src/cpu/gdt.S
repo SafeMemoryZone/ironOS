@@ -16,8 +16,8 @@ load_and_flush_gdt:
     movw %ax, %ss
     
     # Flush code segment
-    # We can't simply store a value into CS. The best way to do this is to use the lretq (long return) instruction.
-    # lretq pops the first value (from the stack) into RIP and pops the next value into CS.
+    # We can't simply store a value into CS. The best way to do this is to use 'lretq' (long return).
+    # 'lretq' pops the first value (from the stack) into RIP and pops the next value into CS.
     pushq $0x08
     lea .flush_cs(%rip), %rax   # Load the address of the label below
     pushq %rax
