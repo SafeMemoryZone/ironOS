@@ -26,7 +26,7 @@ void kmain(void) {
 	log(LL_INFO, "Initilized GDT");
 	init_idt();
 	log(LL_INFO, "Initilized IDT");
-	log(LL_INFO, "Kernel initilization success");
+	log(LL_INFO, "Kernel initilization succeeded");
 
 	// Stop execution
 	hcf();
