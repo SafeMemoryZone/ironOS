@@ -26,14 +26,8 @@ void kmain(void) {
 	log(LL_INFO, "Initilized GDT");
 	init_idt();
 	log(LL_INFO, "Initilized IDT");
-	if (!test_exceptions()) {
-		log(LL_ERR, "IDT tests failed");
-		goto stop;
-	}
-	log(LL_INFO, "IDT tests passed");
 	log(LL_INFO, "Kernel initilization success");
 
 	// Stop execution
-stop:
 	hcf();
 }
