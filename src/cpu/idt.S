@@ -65,7 +65,8 @@ isr_common_stub:
 
     cld
     movq %rsp, %rdi
-    call exception_handler
+    movq active_exception_handler(%rip), %rax
+    call *%rax
 
     popq %r15
     popq %r14
