@@ -41,13 +41,21 @@ else
 fi
 
 # Copy limine binaries
-cp -v "${LIMINE_DATADIR}/limine-bios.sys" \
-      "${LIMINE_DATADIR}/limine-bios-cd.bin" \
-      "${LIMINE_DATADIR}/limine-uefi-cd.bin" \
-      "${ISO_ROOT}/boot/limine/"
-
-cp -v "${LIMINE_DATADIR}/BOOTX64.EFI" "${ISO_ROOT}/EFI/BOOT/"
-cp -v "${LIMINE_DATADIR}/BOOTIA32.EFI" "${ISO_ROOT}/EFI/BOOT/"
+if [ ! -f "${ISO_ROOT}/boot/limine/limine-bios.sys" ]; then
+    cp -v "${LIMINE_DATADIR}/limine-bios.sys" "${ISO_ROOT}/boot/limine/"
+fi
+if [ ! -f "${ISO_ROOT}/boot/limine/limine-bios-cd.bin" ]; then
+    cp -v "${LIMINE_DATADIR}/limine-bios-cd.bin" "${ISO_ROOT}/boot/limine/"
+fi
+if [ ! -f "${ISO_ROOT}/boot/limine/limine-uefi-cd.bin" ]; then
+    cp -v "${LIMINE_DATADIR}/limine-uefi-cd.bin" "${ISO_ROOT}/boot/limine/"
+fi
+if [ ! -f "${ISO_ROOT}/EFI/BOOT/BOOTX64.EFI" ]; then
+    cp -v "${LIMINE_DATADIR}/BOOTX64.EFI" "${ISO_ROOT}/EFI/BOOT/"
+fi
+if [ ! -f "${ISO_ROOT}/EFI/BOOT/BOOTIA32.EFI" ]; then
+    cp -v "${LIMINE_DATADIR}/BOOTIA32.EFI" "${ISO_ROOT}/EFI/BOOT/"
+fi
 
 # Create ISO file
 xorriso -as mkisofs -R -r -J -b boot/limine/limine-bios-cd.bin \
