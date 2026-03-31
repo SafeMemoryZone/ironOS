@@ -54,7 +54,6 @@ LDFLAGS += \
 SRCS := $(shell find $(SRC_DIR) -type f \( -name '*.c' -o -name '*.S' \))
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
--include $(DEPS)
 
 # Rules
 .PHONY: all clean
@@ -78,3 +77,5 @@ $(BUILD_DIR)/%.S.o: %.S
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+-include $(DEPS)

@@ -49,6 +49,10 @@ cp -v "${LIMINE_DATADIR}/limine-bios.sys" \
 cp -v "${LIMINE_DATADIR}/BOOTX64.EFI" "${ISO_ROOT}/EFI/BOOT/"
 cp -v "${LIMINE_DATADIR}/BOOTIA32.EFI" "${ISO_ROOT}/EFI/BOOT/"
 
+# Make limine binaries writable, this makes it possible to recompile the project
+chmod +w "${ISO_ROOT}/boot/limine/limine-bios.sys" "${ISO_ROOT}/boot/limine/limine-bios-cd.bin" "${ISO_ROOT}/boot/limine/limine-uefi-cd.bin"
+chmod +w "${ISO_ROOT}/EFI/BOOT/BOOTX64.EFI" "${ISO_ROOT}/EFI/BOOT/BOOTIA32.EFI"
+
 # Create ISO file
 xorriso -as mkisofs -R -r -J -b boot/limine/limine-bios-cd.bin \
         -no-emul-boot -boot-load-size 4 -boot-info-table -hfsplus \
