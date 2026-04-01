@@ -14,12 +14,14 @@ struct bitmap {
 	size_t hint_index;
 };
 
+extern uintptr_t hhdm;
+
 struct bitmap pmm_bitmap = {.base = NULL, .length = 0, .hint_index = 0};
 
 // divides and rounds up to the nearest integer
 static inline uint64_t div_ceil(uint64_t a, uint64_t b) { return (a + b - 1) / b; }
 
-int pmm_init(const struct limine_memmap_response* mmap, const struct limine_hhdm_response* hhdm) {
+int pmm_init(const struct limine_memmap_response* mmap) {
 	// Step 1: walk the memory map and store:
 	// 1. largest usable region
 	// 2. highest memory address
@@ -53,7 +55,7 @@ int pmm_init(const struct limine_memmap_response* mmap, const struct limine_hhdm
 	// the bitmap is separated into buckets (each 64 bits -> 64 pages)
 	// the length represents the bucket count. NOT the size in bytes
 	uintptr_t bitmap_phys = largest_usable_region->base;
-	bucket_t* bitmap_virt = (bucket_t*)(bitmap_phys + hhdm->offset);
+	bucket_t* bitmap_virt = (bucket_t*)(bitmap_phys + hhdm);
 	uint64_t bitmap_length = div_ceil(page_count, sizeof(bucket_t) * 8);
 	uint64_t bitmap_size = bitmap_length * sizeof(bucket_t);
 
